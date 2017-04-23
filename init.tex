@@ -6,6 +6,8 @@
 \usepackage{ifthen}
 \usepackage{textpos}
 \usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[unicode=true,hidelinks]{hyperref}
 
 \def \nempty {999}
 \def \nchorus {1000}
@@ -48,7 +50,7 @@
 \renewcommand{\capo}[1]{\iftranscapos\transpose{#1}\else\musicnote{\sffamily{}Capo #1\normalfont}\fi}
 
 \newcommand{\musicblock}[1]{\ifchorded #1 \fi}
-%\newcommand{\ctabblock}[1]{\begin{textblock}{10}(5,-0.5)#1\end{textblock}}
+% \newcommand{\ctabblock}[1]{\begin{textblock}{10}(5,-0.5)#1\end{textblock}}
 
 \renewcommand{\idxtitlefont}{\small\normalfont}
 \renewcommand{\idxlyricfont}{\small\normalfont}
@@ -68,23 +70,23 @@
   \ifdim\wd\SB@box>\z@\unhbox\SB@box\par\fi%
 }
 
-\newcommand\textsubscript[1]{\@textsubscript{\selectfont#1}}
-\def\@textsubscript#1{{\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
-\newcommand\textbothscript[2]{%
-  \@textbothscript{\selectfont#1}{\selectfont#2}}
-\def\@textbothscript#1#2{%
-  {\m@th\ensuremath{%
-    ^{\mbox{\fontsize\sf@size\z@#1}}%
-    _{\mbox{\fontsize\sf@size\z@#2}}}}}
-\def\@super{^}\def\@sub{_}
+% \newcommand\textsubscript[1]{\@textsubscript{\selectfont#1}}
+% \def\@textsubscript#1{{\m@th\ensuremath{_{\mbox{\fontsize\sf@size\z@#1}}}}}
+% \newcommand\textbothscript[2]{%
+  % \@textbothscript{\selectfont#1}{\selectfont#2}}
+% \def\@textbothscript#1#2{%
+  % {\m@th\ensuremath{%
+    % ^{\mbox{\fontsize\sf@size\z@#1}}%
+    % _{\mbox{\fontsize\sf@size\z@#2}}}}}
+% \def\@super{^}\def\@sub{_}
 
-\catcode`^\active\catcode`_\active
-\def\@super@sub#1_#2{\textbothscript{#1}{#2}}
-\def\@sub@super#1^#2{\textbothscript{#2}{#1}}
-\def\@@super#1{\@ifnextchar_{\@super@sub{#1}}{\textsuperscript{#1}}}
-\def\@@sub#1{\@ifnextchar^{\@sub@super{#1}}{\textsubscript{#1}}}
-\def^{\let\@next\relax\ifmmode\@super\else\let\@next\@@super\fi\@next}
-\def_{\let\@next\relax\ifmmode\@sub\else\let\@next\@@sub\fi\@next}
+% \catcode`^\active\catcode`_\active
+% \def\@super@sub#1_#2{\textbothscript{#1}{#2}}
+% \def\@sub@super#1^#2{\textbothscript{#2}{#1}}
+% \def\@@super#1{\@ifnextchar_{\@super@sub{#1}}{\textsuperscript{#1}}}
+% \def\@@sub#1{\@ifnextchar^{\@sub@super{#1}}{\textsubscript{#1}}}
+% \def^{\let\@next\relax\ifmmode\@super\else\let\@next\@@super\fi\@next}
+% \def_{\let\@next\relax\ifmmode\@sub\else\let\@next\@@sub\fi\@next}
 
 \makeatother
 
@@ -123,6 +125,9 @@
 % \newcommand{\didx}[1]{$_{\mathrm{#1}}$}
 % \authsepword{ a }
 
+% \usepackage[pdftex]{hyperref}
+% \hypersetup{colorlinks=false}
+
 \begin{document}
 \sffamily
 ~\vspace{\stretch{1}}
@@ -130,7 +135,8 @@
 \Huge{}\textbf{Superzpěvník}\normalsize\\[5ex]
 cokoliv sebrané odkudkoliv\\[1ex]
 bez garance správnosti\\[1.5ex]
-\copyright~Jan Šimbera - Prófa, simbera.jan@gmail.com
+\copyright~Jan Šimbera - Prófa, simbera.jan@gmail.com\\[1.5ex]
+volně šiřitelné pod licencí Creative Commons BY-NC-SA
 \normalfont
 \end{center}
 \vspace{\stretch{2}}

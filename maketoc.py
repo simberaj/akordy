@@ -32,7 +32,7 @@ class Index:
     # input: list of 2-tuples (title, artist)
     for i in range(len(names)):
       title = names[i][0]
-      key = title[0]
+      key = title[0:2] if title.upper().startswith('CH') else title[0]
       index[key].append([title, None])
       if i != 0 and title == names[i-1][0]:
         index[key][-1][1] = names[i][1] # add artist discrimination
@@ -61,7 +61,7 @@ class Index:
       name = title
     else:
       name = title + ' \\emph{(' + artist + ')}'
-    return '\\idxentry{' + name + '}{' + str(i) + '}'
+    return '\\idxentry{%s}{\\hyperlink{song-%i}{\\pageref*{song-%i}}}' % (name, i, i)
     
   def writeTex(self, outfn):
     with open(outfn, 'w', encoding='utf8') as fileout:
