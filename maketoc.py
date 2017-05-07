@@ -47,12 +47,12 @@ class Index:
   
   def outTex(self):
     lines = []
-    i = 1
+    orders = [title for letteritem in self.index.values() for title, artist in letteritem]
+    orders.sort(key=locale.strxfrm)
     for key in sorted(self.index, key=locale.strxfrm):
       lines.append('\\begin{idxblock}{' + key + '}')
       for title, artist in self.index[key]:
-        lines.append(self.entryTex(title, artist, i))
-        i += 1
+        lines.append(self.entryTex(title, artist, orders.index(title) + 1))
       lines.append('\\end{idxblock}')
     return '\n'.join(lines)
   
