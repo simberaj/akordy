@@ -13,6 +13,7 @@
   }, 
   "chordsubs" : {
     "7" : "\\hidx{7}", 
+    "6" : "\\hidx{6}", 
     "maj\\hidx{7}" : "\\hidx{maj7}", 
     "\\hidx{7}maj" : "\\hidx{maj7}", 
     "9" : "\\didx{add9}", 
