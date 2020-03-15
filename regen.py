@@ -1,4 +1,5 @@
 import sys, os, locale, collections, json
+import statistics
 locale.setlocale(locale.LC_ALL, '')
 
 # pridavani akordu k dalsimu slovu - aby nebyly mezery
@@ -56,14 +57,19 @@ class Song:
   
   def loadPlainText(self, lines, line):
     num = 1
+    leftHang = self.calcLeftHang(lines[line:])
     while line < len(lines):
       line = self.skipWhiteLines(lines, line)
       if line < len(lines):
-        line = self.loadPlainVerse(lines, line, num)
+        line = self.loadPlainVerse(lines, line, num, leftHang)
         num += 1
   
-  def loadPlainVerse(self, lines, line, num):
-    verse = Verse(num)
+  def calcLeftHang(self, lines):
+    hangs = [len(line) - len(line.lstrip()) for line in lines]
+    return statistics.mode(hangs)
+  
+  def loadPlainVerse(self, lines, line, num, leftHang):
+    verse = Verse(num, leftHang)
     line = verse.loadPlain(lines, line)
     self.addVerse(verse)
     return line
@@ -88,6 +94,20 @@ class Song:
     self.verses.append(verse)
     self.chords.update(verse.getChords())
   
+  def outPlain(self):
+    outStr = ('\n        {artist} - {title}\n\n'.format(self.name, self.artist) + 
+      '\n     '.join(self.outDescPlain()) + '\n' + 
+      '\n\n'.join(verse.outPlain() for verse in self.verses))
+  
+  def outDescPlain(self):
+    for line in self.desc:
+      if line.startswith('\\capo'):
+        yield 'Capo ' + line[6:-1]
+      elif line.startswith('\\pick'):
+        yield line[6:-1]
+      else:
+        yield line
+  
   def outTex(self):
     outStr = '\\beginsong{' + self.name + '}'
     if self.artist: outStr += '[by={' + self.artist + '}]'
@@ -101,7 +121,7 @@ class Verse:
   INIT_MARK = '\\['
   END_MARK = ']'
 
-  def __init__(self, order):
+  def __init__(self, order, leftHang):
     self.quotes = False
     self.empty = False
     self.chordCache = ''
@@ -109,6 +129,7 @@ class Verse:
     self.lines = []
     self.chordsOn = (order == 1)
     self.chords = set()
+    self.leftHang = leftHang
   
   def loadPlain(self, lines, line):
     self.loadMark(lines, line)
@@ -116,7 +137,7 @@ class Verse:
     while True:
       if line == len(lines):
         break # end of song
-      content = lines[line][4:].rstrip()
+      content = lines[line][self.leftHang:].rstrip()
       if not content.strip(): # no line content
         if initLine:
           self.setEmpty() # if first line, verse is empty
@@ -148,7 +169,7 @@ class Verse:
 
 
   def loadMark(self, lines, line):
-    init = lines[line][:4].strip() # load first line prefix (verse mark)
+    init = lines[line][:self.leftHang].strip() # load first line prefix (verse mark)
     # if the first line has a mark (not a chord line) or is the last one
     if init or (line + 1) == len(lines) or not lines[line+1].strip():
       mark = init[:-1]
@@ -308,6 +329,45 @@ class Verse:
       outStr += '\n'.join(self.lines)
     outStr += self.ending()
     return outStr
+  
+  def outPlain(self):
+    if self.lines:
+      lineno = 1
+      lines = []
+      for line in self.lines:
+        line = line.replace('{', '').replace('}', '')
+        chordline = ''
+        textline = ''
+        if '\\[' in line:
+          chordline = ' ' * 4
+          textline = (self.plainMark().ljust(4) if lineno == 1 else ' ' * 4)
+          parts = line.split('\\[')
+          textline += parts[0]
+          for part in parts:
+            chord, text = part.split(']')
+            diff = len(text) - len(chord)
+            if diff > 0:
+              chordline += chord + ' ' * diff
+              textline += text
+            else:
+              addtextspace = -diff + 1
+              chordline += chord + ' '
+              textline += text
+              if text[-1] == ' ':
+                textline += ' ' * (addtextspace)
+              else:
+                textline += '-'.ljust(addtextspace)
+        else:
+          textline = line
+        if chordline:
+          lines.append(chordline)
+        lines.append(textline)
+        lineno += 1
+    else:
+      return self.plainMark()
+  
+  def plainMark(self):
+    return self.initMark + '.'
   
   def getChords(self):
     return self.chords
